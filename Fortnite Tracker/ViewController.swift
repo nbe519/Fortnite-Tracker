@@ -12,7 +12,6 @@ import SwiftyJSON
 
 class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     
-    
     @IBOutlet weak var soloWins: UILabel!
     @IBOutlet weak var duoWinsLabel: UILabel!
     @IBOutlet weak var squadWinsLabel: UILabel!
@@ -20,6 +19,25 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     @IBOutlet weak var addButton: UIBarButtonItem!
     
     
+    @IBOutlet weak var soloButton: UIButton!
+    @IBOutlet weak var duoButton: UIButton!
+    @IBOutlet weak var squadButton: UIButton!
+    
+    
+    
+    var userSoloWins = ""
+    var duoWins = ""
+    var squadWins = ""
+    
+    var kdSolo = ""
+    var kdDuo = ""
+    var kdSquad = ""
+    
+    var killSolo = ""
+    var killDuo = ""
+    var killSquad = ""
+    
+    var username = ""
     
     let platform = ["Choose a platform", "pc", "xb1", "ps4"]
     let platformDisplayed = ["Choose a platform:", "PC", "Xbox", "PS4"]
@@ -169,15 +187,44 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     func updateUI(json : JSON) {
         
-         let jsonStats = json["stats"]
         
         
-        soloWins.text = "Solo Wins: \(jsonStats["placetop1_solo"])"
-        duoWinsLabel.text = "Duo Wins: \(jsonStats["placetop1_duo"])"
-        squadWinsLabel.text = "Squad Wins: \(jsonStats["placetop1_squad"])"
-        totalWinsLabel.text = "Total Kills: \(json["totals"]["kills"])"
         
-        navigationItem.title = "\(json["username"])"
+        let jsonStats = json["stats"]
+        
+        userSoloWins = "Solo Wins: \(jsonStats["placetop1_solo"])"
+        
+        if userSoloWins == "Solo Wins: null" {
+            navigationItem.title = "User not found"
+            
+        }
+        
+        else {
+            duoWins = "Duo Wins: \(jsonStats["placetop1_duo"])"
+            
+            squadWins = "Squad Wins: \(jsonStats["placetop1_squad"])"
+            
+            kdSolo = "Solo KD: \(jsonStats["kd_solo"])"
+            
+            kdDuo = "Duo KD: \(jsonStats["kd_duo"])"
+            
+            kdSquad = "Squad KD: \(jsonStats["kd_squad"])"
+            
+            killSolo = "Solo Kills: \(jsonStats["kills_solo"])"
+            
+            killDuo = "Duo Kills: \(jsonStats["kills_duo"])"
+            
+            killSquad = "Squad Kills: \(jsonStats["kills_squad"])"
+            
+            username = "\(json["username"])"
+            
+            navigationItem.title = "User found!8"
+            
+            soloButton.isEnabled = true
+            duoButton.isEnabled = true
+            squadButton.isEnabled = true
+        }
+        
         
         
         
@@ -185,6 +232,47 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         
     }
 
+    @IBAction func StatButton(_ sender: Any) {
+        
+        performSegue(withIdentifier: "statSegue", sender: self)
+    
+    }
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+       
+        func updateStatController(winStat : String, kdStat : String, killStat : String) {
+            let vc = segue.destination as? StatsViewController
+            vc?.winText = winStat
+            vc?.kdText = kdStat
+            vc?.killStat = killStat
+            vc?.navigationItem.title = username
+            
+            
+        }
+        
+        if segue.identifier == "statSegue" {
+            
+            updateStatController(winStat: userSoloWins, kdStat: kdSolo, killStat: killSolo)
+            
+            
+        } else if segue.identifier == "duoSegue" {
+            
+            updateStatController(winStat: duoWins, kdStat: kdDuo, killStat: killDuo)
+            
+        } else if segue.identifier == "squadSegue" {
+            
+            updateStatController(winStat: squadWins, kdStat: kdSquad, killStat: killSquad)
+            
+        }
+        
+        
+    }
 
+
+    
+    
+    
+    
 }
 
